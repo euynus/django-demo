@@ -42,25 +42,25 @@ uwsgi:
 	uv run uwsgi --ini uwsgi.ini
 
 docker-build:
-	docker-compose build
+	docker compose build
 
 docker-up:
-	docker-compose up -d
+	docker compose up -d
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 docker-logs:
-	docker-compose logs -f
+	docker compose logs -f
 
 docker-migrate:
-	docker-compose exec web uv run python manage.py migrate
+	docker compose exec web uv run python manage.py migrate
 
 docker-shell:
-	docker-compose exec web /bin/bash
+	docker compose exec web /bin/bash
 
 docker-collectstatic:
-	docker-compose exec web uv run python manage.py collectstatic --noinput
+	docker compose exec web uv run python manage.py collectstatic --noinput
 
 docker-createsuperuser:
-	docker-compose exec web uv run python manage.py createsuperuser
+	docker compose exec web uv run python manage.py createsuperuser
