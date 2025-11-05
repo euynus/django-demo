@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: django-demo-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/app
+      - ./static:/app/static
+      - ./media:/app/media
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=your-secret-key-here-change-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
+      - DATABASE_URL=sqlite:///db.sqlite3
+    depends_on:
+      - db
+    networks:
+      - demo-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: django-demo-db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=demo
+      - POSTGRES_USER=demo
+      - POSTGRES_PASSWORD=demo123
+    networks:
+      - demo-network
+
+volumes:
+  postgres_data:
+
+networks:
+  demo-network:
+    driver: bridge
