@@ -9,11 +9,14 @@ services:
       - .:/app
       - ./static:/app/static
       - ./media:/app/media
+    env_file:
+      - path: .env
+        required: false
     environment:
-      - DEBUG=False
-      - SECRET_KEY=your-secret-key-here-change-in-production
-      - ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
-      - DATABASE_URL=sqlite:///db.sqlite3
+      - DEBUG=${DEBUG:-False}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here-change-in-production}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///db.sqlite3}
     depends_on:
       - db
     networks:
@@ -25,10 +28,13 @@ services:
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - path: .env
+        required: false
     environment:
-      - POSTGRES_DB=demo
-      - POSTGRES_USER=demo
-      - POSTGRES_PASSWORD=demo123
+      - POSTGRES_DB=${POSTGRES_DB:-demo}
+      - POSTGRES_USER=${POSTGRES_USER:-demo}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-demo123}
     networks:
       - demo-network
 

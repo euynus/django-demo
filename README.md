@@ -238,31 +238,83 @@ sudo firewall-cmd --reload
 - HTTPS: https://your-domain.com
 - Django Admin: https://your-domain.com/admin
 
-## 环境变量
+## 环境变量配置
 
-在 `docker-compose.yml` 中可以配置以下环境变量：
+项目使用 `.env` 文件管理环境变量。首次使用需要配置环境变量：
 
-- `DEBUG`: 是否开启调试模式（生产环境应设置为 False）
-- `SECRET_KEY`: Django 密钥（生产环境应修改为随机字符串）
-- `ALLOWED_HOSTS`: 允许访问的主机列表
+### 1. 创建 .env 文件
+
+项目已经包含了默认的 `.env` 文件，但建议根据实际情况修改：
+
+```bash
+# 查看当前配置
+cat .env
+
+# 或复制示例文件并修改
+cp .env.example .env
+nano .env
+```
+
+### 2. 可配置的环境变量
+
+**Django 配置：**
+- `DEBUG`: 调试模式（`True` 或 `False`，生产环境必须为 `False`）
+- `SECRET_KEY`: Django 密钥（生产环境必须修改为随机字符串）
+- `ALLOWED_HOSTS`: 允许访问的主机列表（逗号分隔，如 `localhost,127.0.0.1,example.com`）
 - `DATABASE_URL`: 数据库连接 URL
+
+**PostgreSQL 配置：**
+- `POSTGRES_DB`: 数据库名称（默认：`demo`）
+- `POSTGRES_USER`: 数据库用户（默认：`demo`）
+- `POSTGRES_PASSWORD`: 数据库密码（默认：`demo123`，生产环境必须修改）
+
+### 3. 示例配置
+
+**.env 文件内容示例：**
+
+```bash
+# 开发环境
+DEBUG=True
+SECRET_KEY=dev-secret-key-change-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1
+DATABASE_URL=sqlite:///db.sqlite3
+
+# 生产环境
+# DEBUG=False
+# SECRET_KEY=your-generated-secret-key-here
+# ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+# DATABASE_URL=postgresql://demo:demo123@db:5432/demo
+# POSTGRES_DB=demo
+# POSTGRES_USER=demo
+# POSTGRES_PASSWORD=your-secure-password-here
+```
+
+### 4. 生成安全的 SECRET_KEY
+
+```bash
+python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+```
+
+**注意：** `.env` 文件已被添加到 `.gitignore`，不会被提交到 Git 仓库，确保敏感信息安全。
 
 ## 生产环境注意事项
 
 ### 安全配置
 
-1. **修改密钥**
-   ```bash
-   # 生成随机 SECRET_KEY
-   python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
-   ```
+1. **修改 .env 文件**
+   - 设置 `DEBUG=False`
+   - 生成并设置新的 `SECRET_KEY`（使用上面的生成命令）
+   - 配置正确的 `ALLOWED_HOSTS`
+   - 修改 PostgreSQL 数据库密码
 
-2. **Django 设置**（`demo/settings.py`）
+2. **Django HTTPS 安全设置**（可选，编辑 `demo/settings.py`）
+
+   基本配置（DEBUG, SECRET_KEY, ALLOWED_HOSTS）已通过 `.env` 文件管理。
+
+   如需启用 HTTPS 强制重定向等安全特性，在 `settings.py` 末尾添加：
+
    ```python
-   DEBUG = False
-   ALLOWED_HOSTS = ['your-domain.com', 'www.your-domain.com']
-
-   # HTTPS 安全设置
+   # HTTPS 安全设置（仅在启用 HTTPS 后使用）
    SECURE_SSL_REDIRECT = True
    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
    SESSION_COOKIE_SECURE = True
@@ -274,7 +326,7 @@ sudo firewall-cmd --reload
 
 3. **数据库**
    - 使用 PostgreSQL（已在 docker-compose.yml 中配置）
-   - 修改默认数据库密码
+   - 在 `.env` 中修改 `POSTGRES_PASSWORD`
    - 定期备份数据库
 
 4. **SSL/HTTPS**
