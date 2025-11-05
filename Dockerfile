@@ -13,8 +13,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
-    libpcre3 \
-    libpcre3-dev \
+    libpcre2-8-0 \
+    libpcre2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 uv
